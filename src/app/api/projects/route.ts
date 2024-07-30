@@ -5,13 +5,21 @@ import { serverTimestamp } from 'firebase/firestore'
 import { verifyToken } from '@/libs/utils/verifyToken'
 
 export async function GET(req: NextRequest) {
-    const projects = await getData<Project>('projects')
-    return NextResponse.json({
-        status: true,
-        statusCode: 200,
-        message: 'success',
-        data: projects,
-    })
+    try {
+        const projects = await getData<Project>('projects')
+        return NextResponse.json({
+            status: true,
+            statusCode: 200,
+            message: 'success',
+            data: projects,
+        })
+    } catch (error) {
+        return NextResponse.json({
+            status: false,
+            statusCode: 500,
+            message: 'Terjadi kesalahan.',
+        })
+    }
 }
 
 export async function POST(req: NextRequest) {
@@ -19,18 +27,18 @@ export async function POST(req: NextRequest) {
 
     const projectId = slugify(data.data.name, { lower: true })
 
-    const newData = {
-        name: data.data.name,
-        desc: data.data.desc,
-        category: data.data.category,
-        tools: data.data.tools,
-        date: `${data.data.month} ${data.data.year}`,
-        created_at: serverTimestamp(),
-        updated_at: serverTimestamp(),
-    }
-
     try {
         const decoded = await verifyToken(req)
+
+        const newData = {
+            name: data.data.name,
+            desc: data.data.desc,
+            category: data.data.category,
+            tools: data.data.tools,
+            date: `${data.data.month} ${data.data.year}`,
+            created_at: serverTimestamp(),
+            updated_at: serverTimestamp(),
+        }
 
         await addData('projects', newData, projectId)
 

@@ -13,13 +13,21 @@ export async function GET(
     { params }: { params: { projectId: string } }
 ) {
     const { projectId } = params
-    const project = await getDataById<Project>('projects', projectId)
-    return NextResponse.json({
-        status: true,
-        statusCode: 200,
-        message: 'success',
-        data: project,
-    })
+    try {
+        const project = await getDataById<Project>('projects', projectId)
+        return NextResponse.json({
+            status: true,
+            statusCode: 200,
+            message: 'success',
+            data: project,
+        })
+    } catch (error) {
+        return NextResponse.json({
+            status: false,
+            statusCode: 500,
+            message: 'Terjadi kesalahan.',
+        })
+    }
 }
 
 export async function PUT(
@@ -27,7 +35,7 @@ export async function PUT(
     { params }: { params: { projectId: string } }
 ) {
     const data = await req.json()
-    const projectId = params.projectId
+    const { projectId } = params
 
     try {
         const decoded = await verifyToken(req)

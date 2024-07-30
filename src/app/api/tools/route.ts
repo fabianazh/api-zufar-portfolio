@@ -4,14 +4,22 @@ import slugify from 'slugify'
 import { verifyToken } from '@/libs/utils/verifyToken'
 
 export async function GET(req: NextRequest) {
-    const decoded = await verifyToken(req)
-    const tools = await getData<Tool>('tools')
-    return NextResponse.json({
-        status: true,
-        statusCode: 200,
-        message: 'success',
-        data: tools,
-    })
+    try {
+        const decoded = await verifyToken(req)
+        const tools = await getData<Tool>('tools')
+        return NextResponse.json({
+            status: true,
+            statusCode: 200,
+            message: 'success',
+            data: tools,
+        })
+    } catch (error) {
+        return NextResponse.json({
+            status: false,
+            statusCode: 500,
+            message: 'Terjadi kesalahan.',
+        })
+    }
 }
 
 export async function POST(req: NextRequest) {

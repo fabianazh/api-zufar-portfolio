@@ -6,14 +6,22 @@ export async function GET(
     req: NextRequest,
     { params }: { params: { contactId: string } }
 ) {
-    const contactId = params.contactId
-    const contacts = await getDataById<Contact>('contacts', contactId)
-    return NextResponse.json({
-        status: true,
-        statusCode: 200,
-        message: 'success',
-        data: contacts,
-    })
+    const { contactId } = params
+    try {
+        const contacts = await getDataById<Contact>('contacts', contactId)
+        return NextResponse.json({
+            status: true,
+            statusCode: 200,
+            message: 'success',
+            data: contacts,
+        })
+    } catch (error) {
+        return NextResponse.json({
+            status: false,
+            statusCode: 500,
+            message: 'Terjadi kesalahan.',
+        })
+    }
 }
 
 export async function PUT(
@@ -21,7 +29,7 @@ export async function PUT(
     { params }: { params: { contactId: string } }
 ) {
     const data = await req.json()
-    const contactId = params.contactId
+    const { contactId } = params
 
     try {
         const decoded = await verifyToken(req)
@@ -31,14 +39,14 @@ export async function PUT(
         return NextResponse.json({
             status: true,
             statusCode: 200,
-            message: 'Update info kontak berhasil!',
+            message: 'Info kontak berhasil diperbarui!',
             data: data,
         })
     } catch (error) {
         return NextResponse.json({
             status: false,
             statusCode: 500,
-            message: 'Update info kontak gagal!',
+            message: 'Info kontak gagal diperbarui!',
         })
     }
 }

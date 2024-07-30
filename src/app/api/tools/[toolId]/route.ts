@@ -1,20 +1,28 @@
 import { deleteData, getDataById, updateData } from '@/libs/firebase/service'
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
+import { verifyToken } from '@/libs/utils/verifyToken'
 
 export async function GET(
     req: NextRequest,
     { params }: { params: { toolId: string } }
 ) {
-    const toolId = params.toolId
-    const tools = await getDataById<Tool>('tools', toolId)
+    const { toolId } = params
+    try {
+        const tools = await getDataById<Tool>('tools', toolId)
 
-    return NextResponse.json({
-        status: true,
-        statusCode: 200,
-        message: 'success',
-        data: tools,
-    })
+        return NextResponse.json({
+            status: true,
+            statusCode: 200,
+            message: 'success',
+            data: tools,
+        })
+    } catch (error) {
+        return NextResponse.json({
+            status: false,
+            statusCode: 500,
+            message: 'Terjadi kesalahan.',
+        })
+    }
 }
 
 export async function PUT(
@@ -22,23 +30,10 @@ export async function PUT(
     { params }: { params: { toolId: string } }
 ) {
     const data = await req.json()
-    const toolId = params.toolId
-    const token = req.headers.get('Authorization')?.split(' ')[1] ?? ''
+    const { toolId } = params
 
     try {
-        const decoded = await new Promise((resolve, reject) => {
-            jwt.verify(
-                token,
-                process.env.NEXTAUTH_SECRET as string,
-                (err, decoded) => {
-                    if (err) {
-                        reject(err)
-                    } else {
-                        resolve(decoded)
-                    }
-                }
-            )
-        })
+        const decoded = await verifyToken(req)
 
         await updateData('tools', toolId, data.data)
 
@@ -60,23 +55,10 @@ export async function DELETE(
     req: NextRequest,
     { params }: { params: { toolId: string } }
 ) {
-    const toolId = params.toolId
-    const token = req.headers.get('Authorization')?.split(' ')[1] ?? ''
+    const { toolId } = params
 
     try {
-        const decoded = await new Promise((resolve, reject) => {
-            jwt.verify(
-                token,
-                process.env.NEXTAUTH_SECRET as string,
-                (err, decoded) => {
-                    if (err) {
-                        reject(err)
-                    } else {
-                        resolve(decoded)
-                    }
-                }
-            )
-        })
+        const decoded = await verifyToken(req)
 
         await deleteData('tools', toolId)
 

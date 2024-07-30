@@ -6,29 +6,37 @@ export async function GET(
     req: NextRequest,
     { params }: { params: { mailId: string } }
 ) {
-    const mailId = params.mailId
-    const mail = await getDataById<Mail>('mails', mailId)
+    const { mailId } = params
+    try {
+        const mail = await getDataById<Mail>('mails', mailId)
 
-    if (mail?.isUnread) {
-        const decoded = await verifyToken(req)
-        await updateData('mails', mailId, {
-            isUnread: false,
+        if (mail?.isUnread) {
+            const decoded = await verifyToken(req)
+            await updateData('mails', mailId, {
+                isUnread: false,
+            })
+        }
+
+        return NextResponse.json({
+            status: true,
+            statusCode: 200,
+            message: 'success',
+            data: mail,
+        })
+    } catch (error) {
+        return NextResponse.json({
+            status: false,
+            statusCode: 500,
+            message: 'Terjadi kesalahan.',
         })
     }
-
-    return NextResponse.json({
-        status: true,
-        statusCode: 200,
-        message: 'success',
-        data: mail,
-    })
 }
 
 export async function DELETE(
     req: NextRequest,
     { params }: { params: { mailId: string } }
 ) {
-    const mailId = params.mailId
+    const { mailId } = params
 
     try {
         const decoded = await verifyToken(req)
