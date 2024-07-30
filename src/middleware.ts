@@ -10,7 +10,7 @@ export function middleware(req: Request) {
     )
     res.headers.set(
         'Access-Control-Allow-Headers',
-        'Content-Type, Authorization'
+        'Content-Type, Authorization, Cache-Control'
     )
 
     if (req.method === 'OPTIONS') {
@@ -18,4 +18,8 @@ export function middleware(req: Request) {
     }
 
     return res
+}
+
+export const config = {
+    matcher: '/api/:path*',
 }
