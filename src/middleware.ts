@@ -10,7 +10,7 @@ export function middleware(req: Request) {
     )
     res.headers.set(
         'Access-Control-Allow-Headers',
-        'Content-Type, Authorization, Cache-Control'
+        'Content-Type, Authorization, Expires'
     )
 
     if (req.method === 'OPTIONS') {
