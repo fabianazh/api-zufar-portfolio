@@ -29,18 +29,13 @@ export async function POST(req: NextRequest) {
 
     try {
         const decoded = await verifyToken(req)
+ 
 
-        const newData = {
-            name: data.data.name,
-            desc: data.data.desc,
-            category: data.data.category,
-            tools: data.data.tools,
-            date: `${data.data.month} ${data.data.year}`,
+        await addData('projects', {
+            ...data.data,
             created_at: serverTimestamp(),
             updated_at: serverTimestamp(),
-        }
-
-        await addData('projects', newData, projectId)
+        }, projectId)
 
         return NextResponse.json({
             status: true,
